@@ -1,0 +1,156 @@
+{
+	"name": "tomcat-plus",
+	"displayName": "Tomcat Pluss",
+	"description": "",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.62.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:tomcat-plus.install",
+		"onView:tomcat-plus"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "tomcat-plus.install",
+				"title": "Tomcat Plus: Install version",
+				"icon": "$(add)"
+			},
+			{
+				"command": "tomcat-plus.remove",
+				"title": "Tomcat Plus: Remove version",
+				"icon": "$(dash)"
+			},
+			{
+				"command": "tomcat-plus.toggleServer",
+				"title": "Tomcat Plus: Toggle server",
+				"icon": "$(debug-alt)"
+			},
+			{
+				"command": "tomcat-plus.refreshEntries",
+				"title": "Tomcat Plus: Refresh Server List"
+			},
+			{
+				"command": "tomcat-plus.showCatalinaLog",
+				"title": "Tomcat Plus: Show Catalina Log",
+				"icon": "$(go-to-file)"
+			},
+			{
+				"command": "tomcat-plus.editServerXml",
+				"title": "Tomcat Plus: Edit server.xml",
+				"icon": "$(settings)"
+			},
+			{
+				"command": "tomcat-plus.editContextXml",
+				"title": "Tomcat Plus: Edit context.xml",
+				"icon": "$(settings)"
+			},
+			{
+				"command": "tomcat-plus.editSetenv",
+				"title": "Tomcat Plus: Edit setenv",
+				"icon": "$(settings)"
+			},
+			{
+				"command": "tomcat-plus.addMavenWebapp",
+				"title": "Tomcat Plus: Add Maven Webapp to Tomcat Server"
+			}
+		],
+		"views": {
+			"explorer": [
+				{
+					"id": "tomcat-plus",
+					"contextualTitle": "Tomcat Plus",
+					"name": "Tomcat Plus",
+					"type": "tree",
+					"visibility": "visible"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "tomcat-plus.install",
+					"when": "view == tomcat-plus",
+					"group": "navigation"
+				},
+				{
+					"command": "tomcat-plus.remove",
+					"when": "view == tomcat-plus",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "tomcat-plus.toggleServer",
+					"when": "view == tomcat-plus && viewItem == root",
+					"group": "inline"
+				},
+				{
+					"command": "tomcat-plus.showCatalinaLog",
+					"when": "view == tomcat-plus && viewItem == catalinaLog",
+					"group": "inline"
+				},
+				{
+					"command": "tomcat-plus.editServerXml",
+					"when": "view == tomcat-plus && viewItem == editConfig",
+					"group": "inline"
+				},
+				{
+					"command": "tomcat-plus.editContextXml",
+					"when": "view == tomcat-plus && viewItem == editContext",
+					"group": "inline"
+				},
+				{
+					"command": "tomcat-plus.editSetenv",
+					"when": "view == tomcat-plus && viewItem == editSetenv",
+					"group": "inline"
+				}
+			],
+			"explorer/context": [
+				{
+					"when": "explorerResourceIsFolder",
+					"command": "tomcat-plus.addMavenWebapp",
+					"group": "tomcat-plus"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run package",
+		"compile": "webpack",
+		"watch": "webpack --watch",
+		"package": "webpack --mode production --devtool hidden-source-map",
+		"compile-tests": "tsc -p . --outDir out",
+		"watch-tests": "tsc -p . -w --outDir out",
+		"pretest": "npm run compile-tests && npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.4",
+		"@types/mocha": "^9.0.0",
+		"@types/node": "14.x",
+		"@types/vscode": "^1.62.0",
+		"@typescript-eslint/eslint-plugin": "^5.1.0",
+		"@typescript-eslint/parser": "^5.1.0",
+		"@vscode/test-electron": "^1.6.2",
+		"eslint": "^8.1.0",
+		"glob": "^7.1.7",
+		"mocha": "^9.1.3",
+		"ts-loader": "^9.2.5",
+		"typescript": "^4.4.4",
+		"webpack": "^5.52.1",
+		"webpack-cli": "^4.8.0"
+	},
+	"dependencies": {
+		"axios": "^0.24.0",
+		"extract-zip": "^2.0.1",
+		"find-process": "^1.4.7",
+		"xml2js": "^0.4.23"
+	}
+}
