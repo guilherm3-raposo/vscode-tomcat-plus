@@ -15,7 +15,7 @@ export class TomcatEntry extends vscode.TreeItem {
 		this.contextValue = contextValue;
 		this.pid = pid;
 		this.command = command;
-		this.children = children;
+		this.children = children || [];
 	}
 }
 
@@ -28,8 +28,23 @@ export class TomcatEntryOption extends TomcatEntry {
 		public contextValue?: string,
 		public pid?: number | null,
 		public command?: any,
+		public children?: Array<TomcatEntryOptionWebapp>,
 	) {
-		super(label, name, collapsibleState, contextValue, pid, command);
+		super(label, name, collapsibleState, contextValue, pid, command, children);
+		this.parent = parent;
+	}
+}
+
+export class TomcatEntryOptionWebapp extends TomcatEntry {
+	constructor(
+		public label: string,
+		public name: string,
+		public collapsibleState: vscode.TreeItemCollapsibleState,
+		public parent: TomcatEntryOption,
+		public contextValue?: string,
+		public command?: any,
+	) {
+		super(label, name, collapsibleState, contextValue, command);
 		this.parent = parent;
 	}
 }
@@ -94,6 +109,7 @@ export class TomcatEntryOptionBuilder {
 	private _contextValue?: string;
 	private _pid?: number | null;
 	private _command?: any;
+	private _children?: Array<TomcatEntryOptionWebapp>;
 
 	constructor(label: string, collapsibleState: vscode.TreeItemCollapsibleState, parent: TomcatEntry) {
 		this._label = label;
@@ -110,6 +126,7 @@ export class TomcatEntryOptionBuilder {
 			this._contextValue,
 			this._pid,
 			this._command,
+			this._children,
 		);
 	}
 
@@ -130,6 +147,11 @@ export class TomcatEntryOptionBuilder {
 
 	command(command?: string) {
 		this._command = command;
+		return this;
+	}
+
+	children(children: Array<TomcatEntryOptionWebapp>) {
+		this._children = children;
 		return this;
 	}
 }

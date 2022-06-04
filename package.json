@@ -56,6 +56,16 @@
 				"icon": "$(settings)"
 			},
 			{
+				"command": "tomcat-plus.deployWar",
+				"title": "Tomcat Plus: Deploy war",
+				"icon": "$(diff-added)"
+			},
+			{
+				"command": "tomcat-plus.removeDeployedWar",
+				"title": "Tomcat Plus: Remove deployed war",
+				"icon": "$(trash)"
+			},
+			{
 				"command": "tomcat-plus.addMavenWebapp",
 				"title": "Tomcat Plus: Add Maven Webapp to Tomcat Server"
 			}
@@ -108,6 +118,16 @@
 				{
 					"command": "tomcat-plus.editSetenv",
 					"when": "view == tomcat-plus && viewItem == editSetenv",
+					"group": "inline"
+				},
+				{
+					"command": "tomcat-plus.deployWar",
+					"when": "view == tomcat-plus && viewItem == deployedWars",
+					"group": "inline"
+				},
+				{
+					"command": "tomcat-plus.removeDeployedWar",
+					"when": "view == tomcat-plus && viewItem == removeDeployedWar",
 					"group": "inline"
 				}
 			],

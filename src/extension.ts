@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, PathLike } from "fs";
 import os from "os";
 import path, { sep } from "path";
 import vscode from "vscode";
-import { TomcatEntry, TomcatEntryOption } from "./TomcatEntry";
+import { TomcatEntry, TomcatEntryOption, TomcatEntryOptionWebapp } from "./TomcatEntry";
 import { TomcatTreeviewDataProvider } from "./TomcatTreeviewDataProvider";
 import { MinorVersions } from "./types";
 import {
@@ -143,6 +143,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		treeViewProvider.refresh();
 	});
 
+	let deployWar = vscode.commands.registerCommand("tomcat-plus.deployWar", async (entry: TomcatEntryOptionWebapp) => {
+		vscode.commands.executeCommand("tomcat-plus.addMavenWebapp", entry.parent.name);
+	});
+
 	let addWebapp = vscode.commands.registerCommand("tomcat-plus.addMavenWebapp", async (serverName) => {
 		const [files, err] = await asyncCall(findFiles("*.war"));
 
@@ -163,8 +167,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		selected?.forEach((f, i) => {
 			let warName = f.replace(/.+\//, "");
+
 			run(`ln -s ${f} ${path.join(serversFolder.toString(), serverName, "webapps", warName)}`);
+
+			treeViewProvider.addWarToServer(warName, serverName);
 		});
+
+		treeViewProvider.refresh();
 	});
 
 	/**
@@ -185,6 +194,13 @@ export async function activate(context: vscode.ExtensionContext) {
 	let editSetenv = vscode.commands.registerCommand("tomcat-plus.editSetenv", (entry: TomcatEntryOption) => {
 		treeViewProvider.editSetenv(entry);
 	});
+
+	let removeDeployedWar = vscode.commands.registerCommand(
+		"tomcat-plus.removeDeployedWar",
+		(entry: TomcatEntryOptionWebapp) => {
+			treeViewProvider.removeDeployedWar(entry);
+		},
+	);
 
 	context.subscriptions.push(install);
 	context.subscriptions.push(remove);
