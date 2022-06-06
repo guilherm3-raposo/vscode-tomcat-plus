@@ -143,13 +143,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	let deployWar = vscode.commands.registerCommand("tomcat-plus.deployWar", async (entry: TomcatEntryOptionWebapp) => {
-		vscode.commands.executeCommand("tomcat-plus.addMavenWebapp", null, null, entry.parent.name);
+		vscode.commands.executeCommand("tomcat-plus.addMavenWebapp", null, null, entry);
 	});
 
 	let addWebapp = vscode.commands.registerCommand(
 		"tomcat-plus.addMavenWebapp",
-		async (selectedFile: vscode.Uri, uris: vscode.Uri[], serverName?: string) => {
+		async (selectedFile: vscode.Uri, uris: vscode.Uri[], entry: TomcatEntryOptionWebapp) => {
 			let selected;
+			let serverName: string | undefined = entry?.parent?.parent?.name;
+			let appBase: string | undefined = entry?.name;
 
 			if (uris) {
 				selected = uris.map((uri) => uri.path);
@@ -171,10 +173,18 @@ export async function activate(context: vscode.ExtensionContext) {
 				return vscode.window.showErrorMessage("No server selected");
 			}
 
+			if (!appBase) {
+				const baseOptions = entry.parent.children?.map((child) => child.name);
+				appBase = await vscode.window.showQuickPick(baseOptions || [], {
+					canPickMany: false,
+					title: "Tomcat Plus: Select the appBase to deploy to",
+				});
+			}
+
 			selected?.forEach((f, i) => {
 				let warName = f.replace(/.+\//, "");
 
-				run(`ln -s ${f} ${path.join(serversFolder.toString(), <string>serverName, "webapps", warName)}`);
+				run(`ln -s ${f} ${path.join(serversFolder.toString(), <string>serverName, <string>appBase, warName)}`);
 
 				treeViewProvider.addWarToServer(warName, serverName);
 			});

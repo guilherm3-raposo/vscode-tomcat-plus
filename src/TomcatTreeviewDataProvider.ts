@@ -4,7 +4,7 @@ import path, { sep } from "path";
 import vscode from "vscode";
 import { platform, serversFolder } from "./extension";
 import { TomcatEntry, TomcatEntryOption, TomcatEntryOptionBuilder, TomcatEntryOptionWebapp } from "./TomcatEntry";
-import { getServerPid, isProcessRunning } from "./utils";
+import { getServerPid, getXml, isProcessRunning } from "./utils";
 
 const collapsed = vscode.TreeItemCollapsibleState.Collapsed;
 const expanded = vscode.TreeItemCollapsibleState.Expanded;
@@ -58,59 +58,74 @@ export class TomcatTreeviewDataProvider implements vscode.TreeDataProvider<Tomca
 		return element;
 	}
 
-	getChildren(element?: TomcatEntry): vscode.ProviderResult<any> {
-		if (element?.contextValue === "deployedWars") {
-			return Promise.resolve(element?.children);
-		} else {
-			return new Promise(async (res, rej) => {
-				if (element?.contextValue === "root") {
-					let wars = readdirSync(path.join(serversFolder.toString(), element.name, "webapps"), {
-						withFileTypes: true,
+	async getChildren(element?: TomcatEntry): Promise<any> {
+		switch (element?.contextValue) {
+			case "root":
+				const menuItems = [
+					new TomcatEntryOptionBuilder("Show catalina log", none, element)
+						.contextValue("catalinaLog")
+						.command("tomcat-plus.showCatalinaLog")
+						.build(),
+					new TomcatEntryOptionBuilder("Edit server.xml", none, element)
+						.contextValue("editConfig")
+						.command("tomcat-plus.editConfig")
+						.build(),
+					new TomcatEntryOptionBuilder("Edit context.xml", none, element)
+						.contextValue("editContext")
+						.command("tomcat-plus.editContext")
+						.build(),
+					new TomcatEntryOptionBuilder("Edit setenv", none, element)
+						.contextValue("editSetenv")
+						.command("tomcat-plus.editSetenv")
+						.build(),
+					new TomcatEntryOptionBuilder("Deployed WARs", collapsed, element)
+						.contextValue("deployedWars")
+						.build(),
+				];
+
+				element.children = menuItems;
+				return Promise.resolve(menuItems);
+
+			case "deployedWars":
+				const serverPath = path.join(serversFolder.toString(), (<TomcatEntryOption>element).parent.name);
+				const appBases: string[] = [];
+
+				const serverConf = await getXml(path.join(serverPath, "conf", "server.xml"));
+
+				try {
+					serverConf.Server.Service.forEach((service: any) => {
+						service.Engine.forEach((engine: any) => {
+							engine.Host.forEach((host: any) => {
+								appBases.push(host.$.appBase);
+							});
+						});
 					});
+				} catch (error) {}
 
-					wars = wars.filter((ent) => ent.name.includes("war"));
+				element.children = appBases.map(
+					(base) => new TomcatEntryOption(base, base, collapsed, element, "appBase"),
+				);
 
-					const deployedWars = wars.map(
-						(war) =>
-							new TomcatEntryOptionWebapp(
-								war.name,
-								war.name,
-								none,
-								<TomcatEntryOption>element,
-								"removeDeployedWar",
-								"tomcat-plus.removeDeployedWar",
-							),
-					);
+				return Promise.resolve(element?.children);
 
-					const menuItems = [
-						new TomcatEntryOptionBuilder("Show catalina log", none, element)
-							.contextValue("catalinaLog")
-							.command("tomcat-plus.showCatalinaLog")
-							.build(),
-						new TomcatEntryOptionBuilder("Edit server.xml", none, element)
-							.contextValue("editConfig")
-							.command("tomcat-plus.editConfig")
-							.build(),
-						new TomcatEntryOptionBuilder("Edit context.xml", none, element)
-							.contextValue("editContext")
-							.command("tomcat-plus.editContext")
-							.build(),
-						new TomcatEntryOptionBuilder("Edit setenv", none, element)
-							.contextValue("editSetenv")
-							.command("tomcat-plus.editSetenv")
-							.build(),
-						new TomcatEntryOptionBuilder("Deployed WARs", collapsed, element)
-							.contextValue("deployedWars")
-							.children(deployedWars)
-							.build(),
-					];
+			case "appBase":
+				const serverPath2 = path.join(
+					serversFolder.toString(),
+					(<TomcatEntryOption>(<TomcatEntryOption>element).parent).parent.name,
+				);
+				let wars = readdirSync(path.join(serverPath2, element.name), {
+					withFileTypes: true,
+				});
 
-					element.children = menuItems;
-					res(menuItems);
-				} else {
-					res(this.entries);
-				}
-			});
+				wars = wars.filter((ent) => ent.name.includes("war"));
+				element.children = wars.map((war) => {
+					const name = war.name;
+					return new TomcatEntryOptionWebapp(name, name, none, <TomcatEntryOption>element, "war");
+				});
+				return Promise.resolve(element?.children);
+
+			default:
+				return Promise.resolve(this.entries);
 		}
 	}
 
@@ -143,8 +158,11 @@ export class TomcatTreeviewDataProvider implements vscode.TreeDataProvider<Tomca
 		let success = await vscode.commands.executeCommand("vscode.open", uri);
 	}
 
-	async removeDeployedWar(entry: TomcatEntryOptionWebapp) {
-		const url = path.join(serversFolder.toString(), entry.parent.name, "webapps", entry.name);
+	async removeDeployedWar(entry: any) {
+		if (entry?.contextValue !== "war") {
+			return vscode.window.showErrorMessage("Coming soon! Remove from the war entry itself");
+		}
+		const url = path.join(serversFolder.toString(), entry.parent.parent.parent.name, entry.parent.name, entry.name);
 		await rm(url);
 		return this.refresh();
 	}

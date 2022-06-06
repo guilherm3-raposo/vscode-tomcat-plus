@@ -122,12 +122,12 @@
 				},
 				{
 					"command": "tomcat-plus.deployWar",
-					"when": "view == tomcat-plus && viewItem == deployedWars",
+					"when": "view == tomcat-plus && viewItem == appBase",
 					"group": "inline"
 				},
 				{
 					"command": "tomcat-plus.removeDeployedWar",
-					"when": "view == tomcat-plus && viewItem == removeDeployedWar",
+					"when": "view == tomcat-plus && viewItem == war",
 					"group": "inline"
 				}
 			],
