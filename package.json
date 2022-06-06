@@ -29,6 +29,12 @@
 				"category": "Tomcat Plus"
 			},
 			{
+				"command": "tomcat-plus.refresh",
+				"title": "Refresh",
+				"icon": "$(refresh)",
+				"category": "Tomcat Plus"
+			},
+			{
 				"command": "tomcat-plus.toggleServer",
 				"title": "Toggle server",
 				"icon": "$(debug-alt)",
@@ -101,6 +107,11 @@
 				},
 				{
 					"command": "tomcat-plus.remove",
+					"when": "view == tomcat-plus",
+					"group": "navigation"
+				},
+				{
+					"command": "tomcat-plus.refresh",
 					"when": "view == tomcat-plus",
 					"group": "navigation"
 				}

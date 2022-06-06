@@ -212,6 +212,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		treeViewProvider.editSetenv(entry);
 	});
 
+	let refresh = vscode.commands.registerCommand("tomcat-plus.refresh", (entry: TomcatEntryOption) => {
+		treeViewProvider.refresh();
+	});
+
 	let removeDeployedWar = vscode.commands.registerCommand(
 		"tomcat-plus.removeDeployedWar",
 		(entry: TomcatEntryOptionWebapp) => {
