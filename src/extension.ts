@@ -9,7 +9,6 @@ import {
 	asyncCall,
 	downloadSelectedVersion,
 	fetchMinorVersion,
-	findFiles,
 	isProcessRunning,
 	removeSelectedVersion,
 	run,
@@ -144,37 +143,45 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	let deployWar = vscode.commands.registerCommand("tomcat-plus.deployWar", async (entry: TomcatEntryOptionWebapp) => {
-		vscode.commands.executeCommand("tomcat-plus.addMavenWebapp", entry.parent.name);
+		vscode.commands.executeCommand("tomcat-plus.addMavenWebapp", null, null, entry.parent.name);
 	});
 
-	let addWebapp = vscode.commands.registerCommand("tomcat-plus.addMavenWebapp", async (serverName) => {
-		const [files, err] = await asyncCall(findFiles("*.war"));
+	let addWebapp = vscode.commands.registerCommand(
+		"tomcat-plus.addMavenWebapp",
+		async (selectedFile: vscode.Uri, uris: vscode.Uri[], serverName?: string) => {
+			let selected;
 
-		if (err) {
-			vscode.window.showErrorMessage(err);
-			return;
-		}
+			if (uris) {
+				selected = uris.map((uri) => uri.path);
+			} else {
+				const files = (await vscode.workspace.findFiles("**/*.war")).map((uri) => uri.path);
 
-		const selected = await vscode.window.showQuickPick(files, {
-			canPickMany: true,
-			title: "Tomcat Plus: Select the projects you wish to deploy",
-			placeHolder: "Select projects",
-		});
+				selected = await vscode.window.showQuickPick(files, {
+					canPickMany: true,
+					title: "Tomcat Plus: Select the projects you wish to deploy",
+					placeHolder: "Select projects",
+				});
+			}
 
-		if (!serverName) {
-			serverName = await vscode.window.showQuickPick(treeViewProvider.getServerNames(), serverPickOptions);
-		}
+			if (!serverName) {
+				serverName = await vscode.window.showQuickPick(treeViewProvider.getServerNames(), serverPickOptions);
+			}
 
-		selected?.forEach((f, i) => {
-			let warName = f.replace(/.+\//, "");
+			if (!serverName) {
+				return vscode.window.showErrorMessage("No server selected");
+			}
 
-			run(`ln -s ${f} ${path.join(serversFolder.toString(), serverName, "webapps", warName)}`);
+			selected?.forEach((f, i) => {
+				let warName = f.replace(/.+\//, "");
 
-			treeViewProvider.addWarToServer(warName, serverName);
-		});
+				run(`ln -s ${f} ${path.join(serversFolder.toString(), <string>serverName, "webapps", warName)}`);
 
-		treeViewProvider.refresh();
-	});
+				treeViewProvider.addWarToServer(warName, serverName);
+			});
+
+			treeViewProvider.refresh();
+		},
+	);
 
 	/**
 	 * @TODO Implement logic to select target server for these commands so user can use quickpick

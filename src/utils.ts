@@ -181,44 +181,6 @@ export async function getXml(path: PathLike) {
 	return result;
 }
 
-export async function findFiles(fileSearch: PathLike): Promise<Array<PathLike>> {
-	if (!workspace.workspaceFolders?.length) {
-		return Promise.reject("No workspace folders");
-	}
-
-	const promises: Array<Promise<Array<PathLike>>> = [];
-	let result: Array<PathLike> = [];
-
-	workspace.workspaceFolders.forEach((folder) => {
-		promises.push(
-			new Promise((res, rej) => {
-				let command = "";
-				if (platform === "win32") {
-					command = `dir /B ${fileSearch}`;
-				} else {
-					command = `find ${folder.uri.fsPath} -type f -name ${fileSearch}`;
-				}
-
-				exec(command, function (err, stdout: string, stderr) {
-					if (err) {
-						rej(err);
-					}
-					stdout = stdout.replace(/\r/g, "");
-					const files: Array<PathLike> = stdout.split("\n");
-					files.splice(-1, 1);
-					res(files);
-				});
-			}),
-		);
-	});
-
-	const results = await Promise.all(promises);
-
-	results.forEach((arr) => (result = result.concat(arr)));
-
-	return Promise.resolve(result);
-}
-
 export async function isProcessRunning(pid: number | string | undefined | null) {
 	try {
 		return (await (await find("pid", <number>pid)).length) > 0;

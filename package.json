@@ -133,7 +133,7 @@
 			],
 			"explorer/context": [
 				{
-					"when": "explorerResourceIsFolder",
+					"when": "!explorerResourceIsFolder && resourceFilename =~ /\\.war$/",
 					"command": "tomcat-plus.addMavenWebapp",
 					"group": "tomcat-plus"
 				}
