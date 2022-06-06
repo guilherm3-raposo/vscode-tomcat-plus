@@ -18,56 +18,67 @@
 		"commands": [
 			{
 				"command": "tomcat-plus.install",
-				"title": "Tomcat Plus: Install version",
-				"icon": "$(add)"
+				"title": "Install version",
+				"icon": "$(add)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.remove",
-				"title": "Tomcat Plus: Remove version",
-				"icon": "$(dash)"
+				"title": "Remove version",
+				"icon": "$(dash)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.toggleServer",
-				"title": "Tomcat Plus: Toggle server",
-				"icon": "$(debug-alt)"
+				"title": "Toggle server",
+				"icon": "$(debug-alt)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.refreshEntries",
-				"title": "Tomcat Plus: Refresh Server List"
+				"title": "Refresh Server List",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.showCatalinaLog",
-				"title": "Tomcat Plus: Show Catalina Log",
-				"icon": "$(go-to-file)"
+				"title": "Show Catalina Log",
+				"icon": "$(go-to-file)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.editServerXml",
-				"title": "Tomcat Plus: Edit server.xml",
-				"icon": "$(settings)"
+				"title": "Edit server.xml",
+				"icon": "$(settings)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.editContextXml",
-				"title": "Tomcat Plus: Edit context.xml",
-				"icon": "$(settings)"
+				"title": "Edit context.xml",
+				"icon": "$(settings)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.editSetenv",
-				"title": "Tomcat Plus: Edit setenv",
-				"icon": "$(settings)"
+				"title": "Edit setenv",
+				"icon": "$(settings)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.deployWar",
-				"title": "Tomcat Plus: Deploy war",
-				"icon": "$(diff-added)"
+				"title": "Deploy war",
+				"icon": "$(diff-added)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.removeDeployedWar",
-				"title": "Tomcat Plus: Remove deployed war",
-				"icon": "$(trash)"
+				"title": "Remove deployed war",
+				"icon": "$(trash)",
+				"category": "Tomcat Plus"
 			},
 			{
 				"command": "tomcat-plus.addMavenWebapp",
-				"title": "Tomcat Plus: Add Maven Webapp to Tomcat Server"
+				"title": "Add Maven webapp to tomcat server",
+				"category": "Tomcat Plus"
 			}
 		],
 		"views": {
